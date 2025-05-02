@@ -1,4 +1,4 @@
---Made by WARNINGBOT_DEAD
+-- Made by WARNINGBOT_DEAD 
 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -9,19 +9,19 @@ local TextService = game:GetService("TextService")
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
 
--- Utility function to convert scale to offset
+-- Utility function to convert scale to offset for positioning
 local function ScaleToOffset(scale)
 	local viewportSize = workspace.Camera.ViewportSize
 	return {viewportSize.X * scale[1], viewportSize.Y * scale[2]}
 end
 
--- Default tween info for smooth animations
+-- Default tween info for consistent, smooth animations
 local defaultTweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
 -- PurpleBotUI Library
 local PurpleBotUI = {}
 
--- Tween utility function with easing options
+-- Tween utility function with customizable tween info and optional callback
 function PurpleBotUI:Tween(object, tweenInfo, goal, callback)
 	tweenInfo = tweenInfo or defaultTweenInfo
 	local tween = TweenService:Create(object, tweenInfo, goal)
@@ -36,11 +36,11 @@ end
 function PurpleBotUI:Create(args)
 	args = args or {}
 	local UI = {
-		CurrentTab = nil,
-		Tabs = {},
-		Components = {},
-		Theme = args.Theme or {
-			Primary = Color3.fromRGB(150, 100, 200), -- Vibrant purple
+		CurrentTab = nil,          -- Tracks the currently active tab
+		Tabs = {},                 -- List of all tabs
+		Components = {},           -- Global components (not used currently)
+		Theme = args.Theme or {    -- Default theme with vibrant purple colors
+			Primary = Color3.fromRGB(150, 100, 200),
 			Secondary = Color3.fromRGB(100, 50, 150),
 			Background = Color3.fromRGB(30, 30, 40),
 			Accent = Color3.fromRGB(200, 150, 255),
@@ -50,13 +50,13 @@ function PurpleBotUI:Create(args)
 			Warning = Color3.fromRGB(255, 200, 0),
 			Error = Color3.fromRGB(255, 80, 80),
 		},
-		IsMinimized = false,
-		IsDragging = false,
-		OnDestroyed = args.OnDestroyed,
-		AnimationsEnabled = args.AnimationsEnabled ~= false,
+		IsMinimized = false,       -- Tracks minimization state
+		IsDragging = false,        -- Tracks dragging state
+		OnDestroyed = args.OnDestroyed, -- Callback for UI destruction
+		AnimationsEnabled = args.AnimationsEnabled ~= false, -- Animation toggle
 	}
 
-	-- ScreenGui
+	-- Create ScreenGui to hold the UI
 	UI.ScreenGui = Instance.new("ScreenGui")
 	UI.ScreenGui.Name = "PurpleBotUI_" .. tostring(math.random(1000, 9999))
 	UI.ScreenGui.ResetOnSpawn = false
@@ -64,7 +64,7 @@ function PurpleBotUI:Create(args)
 	UI.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	UI.ScreenGui.Parent = RunService:IsStudio() and player:WaitForChild("PlayerGui") or game:GetService("CoreGui")
 
-	-- Main Frame
+	-- Main Frame: The container for the entire UI
 	UI.MainFrame = Instance.new("Frame", UI.ScreenGui)
 	UI.MainFrame.Name = "Main"
 	UI.MainFrame.BackgroundColor3 = UI.Theme.Background
@@ -74,17 +74,17 @@ function PurpleBotUI:Create(args)
 	UI.MainFrame.BorderSizePixel = 0
 	UI.MainFrame.ZIndex = 10
 
-	-- UICorner for Main Frame
+	-- Add rounded corners to MainFrame
 	UI.MainCorner = Instance.new("UICorner", UI.MainFrame)
 	UI.MainCorner.CornerRadius = UDim.new(0.02, 0)
 
-	-- UIStroke for neumorphic effect
+	-- Add stroke for neumorphic effect
 	UI.MainStroke = Instance.new("UIStroke", UI.MainFrame)
 	UI.MainStroke.Color = UI.Theme.Border
 	UI.MainStroke.Thickness = 1.5
 	UI.MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-	-- Drop Shadow
+	-- Drop Shadow for visual depth
 	UI.ShadowHolder = Instance.new("Frame", UI.MainFrame)
 	UI.ShadowHolder.Name = "ShadowHolder"
 	UI.ShadowHolder.BackgroundTransparency = 1
@@ -103,7 +103,7 @@ function PurpleBotUI:Create(args)
 	UI.Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
 	UI.Shadow.BackgroundTransparency = 1
 
-	-- Top Bar
+	-- Top Bar: Contains title, logo, and control buttons
 	UI.TopBar = Instance.new("Frame", UI.MainFrame)
 	UI.TopBar.Name = "TopBar"
 	UI.TopBar.BackgroundColor3 = UI.Theme.Primary
@@ -115,7 +115,7 @@ function PurpleBotUI:Create(args)
 	UI.TopBarCorner = Instance.new("UICorner", UI.TopBar)
 	UI.TopBarCorner.CornerRadius = UDim.new(0.15, 0)
 
-	-- Title
+	-- Title: Displays the UI name
 	UI.Title = Instance.new("TextLabel", UI.TopBar)
 	UI.Title.Name = "Title"
 	UI.Title.Text = args.Name or "PurpleBotUI"
@@ -132,18 +132,27 @@ function PurpleBotUI:Create(args)
 	UI.TitlePadding = Instance.new("UIPadding", UI.Title)
 	UI.TitlePadding.PaddingLeft = UDim.new(0.05, 0)
 
-	-- Icon (Optional)
+	-- Roblox Logo: Added to enhance visual identity
+	UI.Logo = Instance.new("ImageLabel", UI.TopBar)
+	UI.Logo.Name = "Logo"
+	UI.Logo.Image = "rbxassetid://13114954362" -- Official Roblox logo asset ID
+	UI.Logo.BackgroundTransparency = 1
+	UI.Logo.Size = UDim2.new(0.08, 0, 0.8, 0)
+	UI.Logo.Position = UDim2.new(0.01, 0, 0.1, 0)
+	UI.Logo.ZIndex = 13
+
+	-- Optional Icon: User-specified icon (if provided)
 	if args.Icon then
 		UI.Icon = Instance.new("ImageLabel", UI.TopBar)
 		UI.Icon.Name = "Icon"
 		UI.Icon.Image = args.Icon
 		UI.Icon.BackgroundTransparency = 1
 		UI.Icon.Size = UDim2.new(0.08, 0, 0.8, 0)
-		UI.Icon.Position = UDim2.new(0.01, 0, 0.1, 0)
+		UI.Icon.Position = UDim2.new(0.1, 0, 0.1, 0) -- Adjusted to not overlap logo
 		UI.Icon.ZIndex = 13
 	end
 
-	-- Exit Button
+	-- Exit Button: Closes the UI
 	UI.ExitButton = Instance.new("TextButton", UI.TopBar)
 	UI.ExitButton.Name = "Exit"
 	UI.ExitButton.Text = "×"
@@ -161,7 +170,7 @@ function PurpleBotUI:Create(args)
 		UI.ScreenGui:Destroy()
 	end)
 
-	-- Minimize Button
+	-- Minimize Button: Toggles minimization with animation
 	UI.MinimizeButton = Instance.new("ImageButton", UI.TopBar)
 	UI.MinimizeButton.Name = "Minimize"
 	UI.MinimizeButton.Image = "rbxassetid://7072719338" -- Minimize icon
@@ -170,7 +179,7 @@ function PurpleBotUI:Create(args)
 	UI.MinimizeButton.Position = UDim2.new(0.85, 0, 0.2, 0)
 	UI.MinimizeButton.ZIndex = 14
 
-	-- Sidebar
+	-- Sidebar: Holds tab buttons
 	UI.Sidebar = Instance.new("Frame", UI.MainFrame)
 	UI.Sidebar.Name = "Sidebar"
 	UI.Sidebar.BackgroundColor3 = UI.Theme.Secondary
@@ -183,7 +192,7 @@ function PurpleBotUI:Create(args)
 	UI.SidebarCorner = Instance.new("UICorner", UI.Sidebar)
 	UI.SidebarCorner.CornerRadius = UDim.new(0.05, 0)
 
-	-- Sidebar Holder
+	-- Sidebar Holder: Contains tab buttons with layout
 	UI.SidebarHolder = Instance.new("Frame", UI.Sidebar)
 	UI.SidebarHolder.Name = "Holder"
 	UI.SidebarHolder.BackgroundTransparency = 1
@@ -199,7 +208,7 @@ function PurpleBotUI:Create(args)
 	UI.SidebarPadding.PaddingTop = UDim.new(0.05, 0)
 	UI.SidebarPadding.PaddingLeft = UDim.new(0.05, 0)
 
-	-- Tab Holder
+	-- Tab Holder: Displays active tab content
 	UI.TabHolder = Instance.new("Frame", UI.MainFrame)
 	UI.TabHolder.Name = "TabHolder"
 	UI.TabHolder.BackgroundTransparency = 1
@@ -207,7 +216,7 @@ function PurpleBotUI:Create(args)
 	UI.TabHolder.Position = UDim2.new(0.27, 0, 0.15, 0)
 	UI.TabHolder.ZIndex = 11
 
-	-- Notification Frame
+	-- Notification Frame: Displays temporary messages
 	UI.NotifyFrame = Instance.new("Frame", UI.MainFrame)
 	UI.NotifyFrame.Name = "NotifyFrame"
 	UI.NotifyFrame.BackgroundColor3 = UI.Theme.Background
@@ -246,13 +255,13 @@ function PurpleBotUI:Create(args)
 	UI.NotifyClose.Position = UDim2.new(0.9, 0, 0.05, 0)
 	UI.NotifyClose.ZIndex = 16
 
-	-- Notification Animation
+	-- Notification Animation Setup
 	local notifyEnterPos = UDim2.new(0.3, 0, 0.85, 0)
 	local notifyExitPos = UI.NotifyFrame.Position
 	local notifyTweenIn = TweenService:Create(UI.NotifyFrame, defaultTweenInfo, {Position = notifyEnterPos})
 	local notifyTweenOut = TweenService:Create(UI.NotifyFrame, defaultTweenInfo, {Position = notifyExitPos})
 
-	-- Dragging Functionality
+	-- Dragging Functionality: Allows moving the UI by dragging the top bar
 	local function makeDraggable(frame)
 		local dragging, dragInput, dragStart, startPos
 		local function update(input)
@@ -263,7 +272,7 @@ function PurpleBotUI:Create(args)
 				startPos.Y.Scale,
 				startPos.Y.Offset + delta.Y
 			)
-			-- Boundary checking
+			-- Boundary checking to keep UI on screen
 			local screenSize = workspace.Camera.ViewportSize
 			newPos = UDim2.new(
 				math.clamp(newPos.X.Scale, 0, 1 - frame.Size.X.Scale),
@@ -307,43 +316,48 @@ function PurpleBotUI:Create(args)
 	end
 	makeDraggable(UI.MainFrame)
 
-	-- Minimize Functionality
+	-- Minimize Functionality: Smoothly animates sidebar and tab holder into top bar
 	local originalSize = UI.MainFrame.Size
 	local minimizedSize = args.MinimizedSize or UDim2.new(0.25, 0, 0.12, 0)
-
 	UI.MinimizeButton.MouseButton1Click:Connect(function()
 		UI.IsMinimized = not UI.IsMinimized
 		if UI.IsMinimized then
+			-- Minimizing: Slide Sidebar and TabHolder upwards and resize MainFrame
 			if UI.AnimationsEnabled then
+				PurpleBotUI:Tween(UI.Sidebar, nil, {Position = UDim2.new(0, 0, -0.15, 0)})
+				PurpleBotUI:Tween(UI.TabHolder, nil, {Position = UDim2.new(0.27, 0, -0.15, 0)})
 				PurpleBotUI:Tween(UI.MainFrame, nil, {Size = minimizedSize})
 				PurpleBotUI:Tween(UI.TopBar, nil, {BackgroundColor3 = UI.Theme.Secondary})
 			else
+				UI.Sidebar.Position = UDim2.new(0, 0, -0.15, 0)
+				UI.TabHolder.Position = UDim2.new(0.27, 0, -0.15, 0)
 				UI.MainFrame.Size = minimizedSize
 				UI.TopBar.BackgroundColor3 = UI.Theme.Secondary
 			end
-			UI.Sidebar.Visible = false
-			UI.TabHolder.Visible = false
 			UI.MainStroke.Thickness = 2
 		else
+			-- Maximizing: Restore original positions and size
 			if UI.AnimationsEnabled then
+				PurpleBotUI:Tween(UI.Sidebar, nil, {Position = UDim2.new(0, 0, 0.15, 0)})
+				PurpleBotUI:Tween(UI.TabHolder, nil, {Position = UDim2.new(0.27, 0, 0.15, 0)})
 				PurpleBotUI:Tween(UI.MainFrame, nil, {Size = originalSize})
 				PurpleBotUI:Tween(UI.TopBar, nil, {BackgroundColor3 = UI.Theme.Primary})
 			else
+				UI.Sidebar.Position = UDim2.new(0, 0, 0.15, 0)
+				UI.TabHolder.Position = UDim2.new(0.27, 0, 0.15, 0)
 				UI.MainFrame.Size = originalSize
 				UI.TopBar.BackgroundColor3 = UI.Theme.Primary
 			end
-			UI.Sidebar.Visible = true
-			UI.TabHolder.Visible = true
 			UI.MainStroke.Thickness = 1.5
 		end
 	end)
 
-	-- Notification System
+	-- Notification System: Displays messages with type-specific styling
 	function UI:Notify(options)
 		options = options or {}
 		local text = options.Text or "Notification"
 		local duration = options.Duration or 3
-		local type = options.Type or "Info" -- "Info", "Success", "Warning", "Error"
+		local type = options.Type or "Info" -- Supports "Info", "Success", "Warning", "Error"
 
 		UI.NotifyText.Text = tostring(text)
 		UI.NotifyFrame.BackgroundColor3 = ({
@@ -382,17 +396,17 @@ function PurpleBotUI:Create(args)
 		end)
 	end
 
-	-- Tab Creation
+	-- Tab Creation: Manages tab buttons and content
 	function UI:CreateTab(options)
 		options = options or {}
 		local Tab = {
 			Name = options.Name or "Tab",
-			IsActive = false,
-			Hover = false,
-			Components = {},
+			IsActive = false,      -- Tracks if tab is currently active
+			Hover = false,         -- Tracks hover state for effects
+			Components = {},       -- List of components in this tab
 		}
 
-		-- Tab Button
+		-- Tab Button: Button in sidebar to select tab
 		Tab.Button = Instance.new("TextButton", UI.SidebarHolder)
 		Tab.Button.Name = options.Name or "TabButton"
 		Tab.Button.Text = options.Name or "Tab"
@@ -421,7 +435,7 @@ function PurpleBotUI:Create(args)
 		Tab.ButtonStroke.Thickness = 1
 		Tab.ButtonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-		-- Tab Content
+		-- Tab Content: Scrolling frame for components
 		Tab.ScrollingFrame = Instance.new("ScrollingFrame", UI.TabHolder)
 		Tab.ScrollingFrame.Name = options.Name or "TabContent"
 		Tab.ScrollingFrame.BackgroundTransparency = 1
@@ -444,7 +458,20 @@ function PurpleBotUI:Create(args)
 		Tab.Padding.PaddingLeft = UDim2.new(0.02, 0)
 		Tab.Padding.PaddingRight = UDim2.new(0.02, 0)
 
-		-- Hover Effects
+		-- Default Label: Shown when no components are added
+		Tab.DefaultLabel = Instance.new("TextLabel", Tab.ScrollingFrame)
+		Tab.DefaultLabel.Name = "DefaultLabel"
+		Tab.DefaultLabel.Text = "No components added to this tab."
+		Tab.DefaultLabel.TextColor3 = UI.Theme.Text
+		Tab.DefaultLabel.TextScaled = true
+		Tab.DefaultLabel.FontFace = Font.new("rbxasset://fonts/families/Roboto.json")
+		Tab.DefaultLabel.BackgroundTransparency = 1
+		Tab.DefaultLabel.Size = UDim2.new(0.9, 0, 0.1, 0)
+		Tab.DefaultLabel.Position = UDim2.new(0.05, 0, 0.05, 0)
+		Tab.DefaultLabel.ZIndex = 12
+		Tab.DefaultLabel.Visible = true -- Initially visible since no components
+
+		-- Hover Effects: Visual feedback on mouse enter/leave
 		Tab.Button.MouseEnter:Connect(function()
 			Tab.Hover = true
 			if not Tab.IsActive then
@@ -473,7 +500,7 @@ function PurpleBotUI:Create(args)
 			end
 		end)
 
-		-- Tab Activation
+		-- Tab Activation: Shows tab content and updates button style
 		function Tab:Activate()
 			if not Tab.IsActive then
 				Tab.IsActive = true
@@ -487,9 +514,11 @@ function PurpleBotUI:Create(args)
 					Tab.ButtonStroke.Color = UI.Theme.Primary
 				end
 				Tab.ScrollingFrame.Visible = true
+				Tab.DefaultLabel.Visible = (#Tab.Components == 0) -- Show default message if no components
 			end
 		end
 
+		-- Tab Deactivation: Hides tab content and resets button style
 		function Tab:Deactivate()
 			if Tab.IsActive then
 				Tab.IsActive = false
@@ -531,17 +560,14 @@ function PurpleBotUI:Create(args)
 			Button.Frame.BorderSizePixel = 0
 			Button.Frame.ZIndex = 12
 
-			-- Button Corner
 			Button.Corner = Instance.new("UICorner", Button.Frame)
 			Button.Corner.CornerRadius = UDim.new(0.1, 0)
 
-			-- Button Stroke
 			Button.Stroke = Instance.new("UIStroke", Button.Frame)
 			Button.Stroke.Color = Button.IsToggled and UI.Theme.Accent or UI.Theme.Border
 			Button.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Button.Stroke.Thickness = 1.5
 
-			-- Button Text
 			Button.Text = Instance.new("TextLabel", Button.Frame)
 			Button.Text.Text = options.Text or "Button"
 			Button.Text.TextColor3 = UI.Theme.Text
@@ -553,7 +579,6 @@ function PurpleBotUI:Create(args)
 			Button.Text.Position = UDim2.new(0.05, 0, 0.15, 0)
 			Button.Text.ZIndex = 13
 
-			-- Button Icon
 			if options.Icon then
 				Button.Icon = Instance.new("ImageLabel", Button.Frame)
 				Button.Icon.Name = "Icon"
@@ -564,7 +589,6 @@ function PurpleBotUI:Create(args)
 				Button.Icon.ZIndex = 13
 			end
 
-			-- Button Interactions
 			Button.Frame.MouseButton1Click:Connect(function()
 				if options.Toggleable then
 					Button.IsToggled = not Button.IsToggled
@@ -579,7 +603,6 @@ function PurpleBotUI:Create(args)
 				end
 			end)
 
-			-- Hover Effect
 			Button.Frame.MouseEnter:Connect(function()
 				if UI.AnimationsEnabled then
 					PurpleBotUI:Tween(Button.Frame, nil, {BackgroundColor3 = UI.Theme.Secondary})
@@ -620,7 +643,20 @@ function PurpleBotUI:Create(args)
 				return Button.IsToggled
 			end
 
+			-- Update theme when created
+			function Button:UpdateTheme()
+				Button.Frame.BackgroundColor3 = UI.Theme.Background
+				Button.Stroke.Color = Button.IsToggled and UI.Theme.Accent or UI.Theme.Border
+				Button.Text.TextColor3 = UI.Theme.Text
+				if Button.Icon then
+					Button.Icon.ImageColor3 = UI.Theme.Text
+				end
+			end
+
 			table.insert(Tab.Components, Button)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
 			return Button
 		end
 
@@ -642,17 +678,14 @@ function PurpleBotUI:Create(args)
 			Slider.Frame.BorderSizePixel = 0
 			Slider.Frame.ZIndex = 12
 
-			-- Slider Corner
 			Slider.Corner = Instance.new("UICorner", Slider.Frame)
 			Slider.Corner.CornerRadius = UDim.new(0.1, 0)
 
-			-- Slider Stroke
 			Slider.Stroke = Instance.new("UIStroke", Slider.Frame)
 			Slider.Stroke.Color = UI.Theme.Border
 			Slider.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Slider.Stroke.Thickness = 1.5
 
-			-- Slider Title
 			Slider.Title = Instance.new("TextLabel", Slider.Frame)
 			Slider.Title.Text = options.Text or "Slider"
 			Slider.Title.TextColor3 = UI.Theme.Text
@@ -664,7 +697,6 @@ function PurpleBotUI:Create(args)
 			Slider.Title.Position = UDim2.new(0.05, 0, 0.1, 0)
 			Slider.Title.ZIndex = 13
 
-			-- Slider Value
 			Slider.ValueText = Instance.new("TextBox", Slider.Frame)
 			Slider.ValueText.Text = tostring(Slider.Value)
 			Slider.ValueText.TextColor3 = UI.Theme.Text
@@ -676,11 +708,9 @@ function PurpleBotUI:Create(args)
 			Slider.ValueText.ZIndex = 13
 			Slider.ValueText.BorderSizePixel = 0
 
-			-- Value Text Corner
 			Slider.ValueCorner = Instance.new("UICorner", Slider.ValueText)
 			Slider.ValueCorner.CornerRadius = UDim.new(0.2, 0)
 
-			-- Slider Bar
 			Slider.Bar = Instance.new("TextButton", Slider.Frame)
 			Slider.Bar.Name = "Bar"
 			Slider.Bar.Text = ""
@@ -691,11 +721,9 @@ function PurpleBotUI:Create(args)
 			Slider.Bar.ZIndex = 13
 			Slider.Bar.BorderSizePixel = 0
 
-			-- Bar Corner
 			Slider.BarCorner = Instance.new("UICorner", Slider.Bar)
 			Slider.BarCorner.CornerRadius = UDim.new(1, 0)
 
-			-- Fill Bar
 			Slider.Fill = Instance.new("Frame", Slider.Bar)
 			Slider.Fill.Name = "Fill"
 			Slider.Fill.BackgroundColor3 = UI.Theme.Accent
@@ -703,7 +731,6 @@ function PurpleBotUI:Create(args)
 			Slider.Fill.BorderSizePixel = 0
 			Slider.Fill.ZIndex = 14
 
-			-- Fill Corner
 			Slider.FillCorner = Instance.new("UICorner", Slider.Fill)
 			Slider.FillCorner.CornerRadius = UDim.new(1, 0)
 
@@ -761,7 +788,21 @@ function PurpleBotUI:Create(args)
 				Slider.Callback = callback
 			end
 
+			-- Update theme when created
+			function Slider:UpdateTheme()
+				Slider.Frame.BackgroundColor3 = UI.Theme.Background
+				Slider.Stroke.Color = UI.Theme.Border
+				Slider.Title.TextColor3 = UI.Theme.Text
+				Slider.ValueText.TextColor3 = UI.Theme.Text
+				Slider.ValueText.BackgroundColor3 = UI.Theme.Secondary
+				Slider.Bar.BackgroundColor3 = UI.Theme.Border
+				Slider.Fill.BackgroundColor3 = UI.Theme.Accent
+			end
+
 			table.insert(Tab.Components, Slider)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
 			return Slider
 		end
 
@@ -785,17 +826,14 @@ function PurpleBotUI:Create(args)
 			Dropdown.Frame.BorderSizePixel = 0
 			Dropdown.Frame.ZIndex = 12
 
-			-- Dropdown Corner
 			Dropdown.Corner = Instance.new("UICorner", Dropdown.Frame)
 			Dropdown.Corner.CornerRadius = UDim.new(0.1, 0)
 
-			-- Dropdown Stroke
 			Dropdown.Stroke = Instance.new("UIStroke", Dropdown.Frame)
 			Dropdown.Stroke.Color = UI.Theme.Border
 			Dropdown.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Dropdown.Stroke.Thickness = 1.5
 
-			-- Dropdown Title
 			Dropdown.Title = Instance.new("TextLabel", Dropdown.Frame)
 			Dropdown.Title.Text = options.Text or "Dropdown"
 			Dropdown.Title.TextColor3 = UI.Theme.Text
@@ -807,7 +845,6 @@ function PurpleBotUI:Create(args)
 			Dropdown.Title.Position = UDim2.new(0.05, 0, 0.25, 0)
 			Dropdown.Title.ZIndex = 13
 
-			-- Dropdown Icon
 			Dropdown.Icon = Instance.new("ImageLabel", Dropdown.Frame)
 			Dropdown.Icon.Image = "rbxassetid://7072719338" -- Chevron down
 			Dropdown.Icon.BackgroundTransparency = 1
@@ -815,7 +852,6 @@ function PurpleBotUI:Create(args)
 			Dropdown.Icon.Position = UDim2.new(0.85, 0, 0.25, 0)
 			Dropdown.Icon.ZIndex = 13
 
-			-- Options Frame
 			Dropdown.OptionsFrame = Instance.new("ScrollingFrame", Dropdown.Frame)
 			Dropdown.OptionsFrame.Name = "Options"
 			Dropdown.OptionsFrame.BackgroundTransparency = 1
@@ -829,12 +865,10 @@ function PurpleBotUI:Create(args)
 			Dropdown.OptionsFrame.Visible = false
 			Dropdown.OptionsFrame.ZIndex = 14
 
-			-- Options Layout
 			Dropdown.OptionsLayout = Instance.new("UIListLayout", Dropdown.OptionsFrame)
 			Dropdown.OptionsLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			Dropdown.OptionsLayout.Padding = UDim.new(0.02, 0)
 
-			-- Options Padding
 			Dropdown.OptionsPadding = Instance.new("UIPadding", Dropdown.OptionsFrame)
 			Dropdown.OptionsPadding.PaddingTop = UDim.new(0.05, 0)
 
@@ -876,11 +910,9 @@ function PurpleBotUI:Create(args)
 				opt.Button.ZIndex = 15
 				opt.Button.BorderSizePixel = 0
 
-				-- Option Corner
 				opt.Corner = Instance.new("UICorner", opt.Button)
 				opt.Corner.CornerRadius = UDim.new(0.2, 0)
 
-				-- Option Stroke
 				opt.Stroke = Instance.new("UIStroke", opt.Button)
 				opt.Stroke.Color = UI.Theme.Border
 				opt.Stroke.Thickness = 1
@@ -898,7 +930,6 @@ function PurpleBotUI:Create(args)
 					end
 				end)
 
-				-- Hover Effect
 				opt.Button.MouseEnter:Connect(function()
 					if UI.AnimationsEnabled then
 						PurpleBotUI:Tween(opt.Button, nil, {BackgroundColor3 = UI.Theme.Primary})
@@ -925,7 +956,6 @@ function PurpleBotUI:Create(args)
 				return opt
 			end
 
-			-- Initialize options
 			if options.Options then
 				for _, opt in ipairs(options.Options) do
 					Dropdown:AddOption(opt)
@@ -940,7 +970,24 @@ function PurpleBotUI:Create(args)
 				Dropdown.Callback = callback
 			end
 
+			-- Update theme when created
+			function Dropdown:UpdateTheme()
+				Dropdown.Frame.BackgroundColor3 = UI.Theme.Background
+				Dropdown.Stroke.Color = UI.Theme.Border
+				Dropdown.Title.TextColor3 = UI.Theme.Text
+				Dropdown.Icon.ImageColor3 = UI.Theme.Text
+				for _, opt in ipairs(Dropdown.Options) do
+					opt.Button.TextColor3 = UI.Theme.Text
+					opt.Button.BackgroundColor3 = UI.Theme.Secondary
+					opt.Stroke.Color = (Dropdown.Selected == opt.Name) and UI.Theme.Accent or UI.Theme.Border
+				end
+				Dropdown.OptionsFrame.ScrollBarImageColor3 = UI.Theme.Accent
+			end
+
 			table.insert(Tab.Components, Dropdown)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
 			return Dropdown
 		end
 
@@ -962,17 +1009,14 @@ function PurpleBotUI:Create(args)
 			Toggle.Frame.BorderSizePixel = 0
 			Toggle.Frame.ZIndex = 12
 
-			-- Toggle Corner
 			Toggle.Corner = Instance.new("UICorner", Toggle.Frame)
 			Toggle.Corner.CornerRadius = UDim.new(0.1, 0)
 
-			-- Toggle Stroke
 			Toggle.Stroke = Instance.new("UIStroke", Toggle.Frame)
 			Toggle.Stroke.Color = UI.Theme.Border
 			Toggle.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Toggle.Stroke.Thickness = 1.5
 
-			-- Toggle Text
 			Toggle.Text = Instance.new("TextLabel", Toggle.Frame)
 			Toggle.Text.Text = options.Text or "Toggle"
 			Toggle.Text.TextColor3 = UI.Theme.Text
@@ -984,7 +1028,6 @@ function PurpleBotUI:Create(args)
 			Toggle.Text.Position = UDim2.new(0.05, 0, 0.15, 0)
 			Toggle.Text.ZIndex = 13
 
-			-- Toggle Indicator
 			Toggle.Indicator = Instance.new("Frame", Toggle.Frame)
 			Toggle.Indicator.Name = "Indicator"
 			Toggle.Indicator.BackgroundColor3 = Toggle.IsToggled and UI.Theme.Accent or UI.Theme.Border
@@ -993,11 +1036,9 @@ function PurpleBotUI:Create(args)
 			Toggle.Indicator.ZIndex = 13
 			Toggle.Indicator.BorderSizePixel = 0
 
-			-- Indicator Corner
 			Toggle.IndicatorCorner = Instance.new("UICorner", Toggle.Indicator)
 			Toggle.IndicatorCorner.CornerRadius = UDim.new(0.5, 0)
 
-			-- Indicator Stroke
 			Toggle.IndicatorStroke = Instance.new("UIStroke", Toggle.Indicator)
 			Toggle.IndicatorStroke.Color = UI.Theme.Text
 			Toggle.IndicatorStroke.Thickness = 1
@@ -1050,7 +1091,19 @@ function PurpleBotUI:Create(args)
 				Toggle.Frame.BackgroundTransparency = 0
 			end
 
+			-- Update theme when created
+			function Toggle:UpdateTheme()
+				Toggle.Frame.BackgroundColor3 = UI.Theme.Background
+				Toggle.Stroke.Color = UI.Theme.Border
+				Toggle.Text.TextColor3 = UI.Theme.Text
+				Toggle.Indicator.BackgroundColor3 = Toggle.IsToggled and UI.Theme.Accent or UI.Theme.Border
+				Toggle.IndicatorStroke.Color = UI.Theme.Text
+			end
+
 			table.insert(Tab.Components, Toggle)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
 			return Toggle
 		end
 
@@ -1069,17 +1122,14 @@ function PurpleBotUI:Create(args)
 			TextBox.Frame.BorderSizePixel = 0
 			TextBox.Frame.ZIndex = 12
 
-			-- TextBox Corner
 			TextBox.Corner = Instance.new("UICorner", TextBox.Frame)
 			TextBox.Corner.CornerRadius = UDim.new(0.1, 0)
 
-			-- TextBox Stroke
 			TextBox.Stroke = Instance.new("UIStroke", TextBox.Frame)
 			TextBox.Stroke.Color = UI.Theme.Border
 			TextBox.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			TextBox.Stroke.Thickness = 1.5
 
-			-- TextBox Label
 			TextBox.Label = Instance.new("TextLabel", TextBox.Frame)
 			TextBox.Label.Text = options.Text or "TextBox"
 			TextBox.Label.TextColor3 = UI.Theme.Text
@@ -1091,7 +1141,6 @@ function PurpleBotUI:Create(args)
 			TextBox.Label.Position = UDim2.new(0.05, 0, 0.25, 0)
 			TextBox.Label.ZIndex = 13
 
-			-- TextBox Input
 			TextBox.Input = Instance.new("TextBox", TextBox.Frame)
 			TextBox.Input.Text = TextBox.Text
 			TextBox.Input.TextColor3 = UI.Theme.Text
@@ -1106,11 +1155,9 @@ function PurpleBotUI:Create(args)
 			TextBox.Input.PlaceholderText = options.Placeholder or "Enter text..."
 			TextBox.Input.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
 
-			-- Input Corner
 			TextBox.InputCorner = Instance.new("UICorner", TextBox.Input)
 			TextBox.InputCorner.CornerRadius = UDim.new(0.2, 0)
 
-			-- Input Padding
 			TextBox.InputPadding = Instance.new("UIPadding", TextBox.Input)
 			TextBox.InputPadding.PaddingLeft = UDim.new(0.05, 0)
 
@@ -1134,7 +1181,19 @@ function PurpleBotUI:Create(args)
 				TextBox.Callback = callback
 			end
 
+			-- Update theme when created
+			function TextBox:UpdateTheme()
+				TextBox.Frame.BackgroundColor3 = UI.Theme.Background
+				TextBox.Stroke.Color = UI.Theme.Border
+				TextBox.Label.TextColor3 = UI.Theme.Text
+				TextBox.Input.TextColor3 = UI.Theme.Text
+				TextBox.Input.BackgroundColor3 = UI.Theme.Secondary
+			end
+
 			table.insert(Tab.Components, TextBox)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
 			return TextBox
 		end
 
@@ -1151,17 +1210,14 @@ function PurpleBotUI:Create(args)
 			Label.Frame.BorderSizePixel = 0
 			Label.Frame.ZIndex = 12
 
-			-- Label Corner
 			Label.Corner = Instance.new("UICorner", Label.Frame)
 			Label.Corner.CornerRadius = UDim.new(0.1, 0)
 
-			-- Label Stroke
 			Label.Stroke = Instance.new("UIStroke", Label.Frame)
 			Label.Stroke.Color = UI.Theme.Border
 			Label.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Label.Stroke.Thickness = 1.5
 
-			-- Label Text
 			Label.Text = Instance.new("TextLabel", Label.Frame)
 			Label.Text.Text = options.Text or "Label"
 			Label.Text.TextColor3 = options.TextColor or UI.Theme.Text
@@ -1174,7 +1230,6 @@ function PurpleBotUI:Create(args)
 			Label.Text.ZIndex = 13
 			Label.Text.AutomaticSize = Enum.AutomaticSize.Y
 
-			-- Text Padding
 			Label.Padding = Instance.new("UIPadding", Label.Text)
 			Label.Padding.PaddingTop = UDim.new(0.1, 0)
 			Label.Padding.PaddingBottom = UDim.new(0.1, 0)
@@ -1193,7 +1248,17 @@ function PurpleBotUI:Create(args)
 				Label.Text.TextColor3 = color
 			end
 
+			-- Update theme when created
+			function Label:UpdateTheme()
+				Label.Frame.BackgroundColor3 = UI.Theme.Background
+				Label.Stroke.Color = UI.Theme.Border
+				Label.Text.TextColor3 = UI.Theme.Text
+			end
+
 			table.insert(Tab.Components, Label)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
 			return Label
 		end
 
@@ -1213,17 +1278,14 @@ function PurpleBotUI:Create(args)
 			Keybind.Frame.BorderSizePixel = 0
 			Keybind.Frame.ZIndex = 12
 
-			-- Keybind Corner
 			Keybind.Corner = Instance.new("UICorner", Keybind.Frame)
 			Keybind.Corner.CornerRadius = UDim.new(0.1, 0)
 
-			-- Keybind Stroke
 			Keybind.Stroke = Instance.new("UIStroke", Keybind.Frame)
 			Keybind.Stroke.Color = UI.Theme.Border
 			Keybind.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Keybind.Stroke.Thickness = 1.5
 
-			-- Keybind Label
 			Keybind.Label = Instance.new("TextLabel", Keybind.Frame)
 			Keybind.Label.Text = options.Text or "Keybind"
 			Keybind.Label.TextColor3 = UI.Theme.Text
@@ -1235,7 +1297,6 @@ function PurpleBotUI:Create(args)
 			Keybind.Label.Position = UDim2.new(0.05, 0, 0.25, 0)
 			Keybind.Label.ZIndex = 13
 
-			-- Keybind Button
 			Keybind.Button = Instance.new("TextButton", Keybind.Frame)
 			Keybind.Button.Text = Keybind.Key.Name
 			Keybind.Button.TextColor3 = UI.Theme.Text
@@ -1247,7 +1308,6 @@ function PurpleBotUI:Create(args)
 			Keybind.Button.ZIndex = 13
 			Keybind.Button.BorderSizePixel = 0
 
-			-- Button Corner
 			Keybind.ButtonCorner = Instance.new("UICorner", Keybind.Button)
 			Keybind.ButtonCorner.CornerRadius = UDim.new(0.2, 0)
 
@@ -1292,7 +1352,19 @@ function PurpleBotUI:Create(args)
 				Keybind.Callback = callback
 			end
 
+			-- Update theme when created
+			function Keybind:UpdateTheme()
+				Keybind.Frame.BackgroundColor3 = UI.Theme.Background
+				Keybind.Stroke.Color = UI.Theme.Border
+				Keybind.Label.TextColor3 = UI.Theme.Text
+				Keybind.Button.TextColor3 = UI.Theme.Text
+				Keybind.Button.BackgroundColor3 = UI.Theme.Secondary
+			end
+
 			table.insert(Tab.Components, Keybind)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
 			return Keybind
 		end
 
@@ -1315,17 +1387,14 @@ function PurpleBotUI:Create(args)
 			ColorPicker.Frame.BorderSizePixel = 0
 			ColorPicker.Frame.ZIndex = 12
 
-			-- ColorPicker Corner
 			ColorPicker.Corner = Instance.new("UICorner", ColorPicker.Frame)
 			ColorPicker.Corner.CornerRadius = UDim.new(0.1, 0)
 
-			-- ColorPicker Stroke
 			ColorPicker.Stroke = Instance.new("UIStroke", ColorPicker.Frame)
 			ColorPicker.Stroke.Color = UI.Theme.Border
 			ColorPicker.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			ColorPicker.Stroke.Thickness = 1.5
 
-			-- ColorPicker Label
 			ColorPicker.Label = Instance.new("TextLabel", ColorPicker.Frame)
 			ColorPicker.Label.Text = options.Text or "ColorPicker"
 			ColorPicker.Label.TextColor3 = UI.Theme.Text
@@ -1337,7 +1406,6 @@ function PurpleBotUI:Create(args)
 			ColorPicker.Label.Position = UDim2.new(0.05, 0, 0.25, 0)
 			ColorPicker.Label.ZIndex = 13
 
-			-- Color Preview
 			ColorPicker.Preview = Instance.new("Frame", ColorPicker.Frame)
 			ColorPicker.Preview.BackgroundColor3 = ColorPicker.Color
 			ColorPicker.Preview.Size = UDim2.new(0.1, 0, 0.6, 0)
@@ -1345,11 +1413,9 @@ function PurpleBotUI:Create(args)
 			ColorPicker.Preview.ZIndex = 13
 			ColorPicker.Preview.BorderSizePixel = 0
 
-			-- Preview Corner
 			ColorPicker.PreviewCorner = Instance.new("UICorner", ColorPicker.Preview)
 			ColorPicker.PreviewCorner.CornerRadius = UDim.new(0.2, 0)
 
-			-- Picker Panel
 			ColorPicker.Panel = Instance.new("Frame", ColorPicker.Frame)
 			ColorPicker.Panel.Name = "PickerPanel"
 			ColorPicker.Panel.BackgroundColor3 = UI.Theme.Secondary
@@ -1359,19 +1425,16 @@ function PurpleBotUI:Create(args)
 			ColorPicker.Panel.Visible = false
 			ColorPicker.Panel.ClipsDescendants = true
 
-			-- Panel Corner
 			ColorPicker.PanelCorner = Instance.new("UICorner", ColorPicker.Panel)
 			ColorPicker.PanelCorner.CornerRadius = UDim.new(0.1, 0)
 
-			-- Saturation/Value Gradient
 			ColorPicker.SVGradient = Instance.new("ImageLabel", ColorPicker.Panel)
 			ColorPicker.SVGradient.Image = "rbxassetid://4155801252" -- Saturation/Value gradient
 			ColorPicker.SVGradient.Size = UDim2.new(0.7, 0, 0.7, 0)
 			ColorPicker.SVGradient.Position = UDim2.new(0.05, 0, 0.1, 0)
 			ColorPicker.SVGradient.ZIndex = 15
-			ColorPicker.SVGradient.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Hue base
+			ColorPicker.SVGradient.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 
-			-- SV Cursor
 			ColorPicker.SVCursor = Instance.new("Frame", ColorPicker.SVGradient)
 			ColorPicker.SVCursor.Size = UDim2.new(0.05, 0, 0.05, 0)
 			ColorPicker.SVCursor.BackgroundColor3 = ColorPicker.Color
@@ -1379,14 +1442,12 @@ function PurpleBotUI:Create(args)
 			ColorPicker.SVCursor.BorderSizePixel = 1
 			ColorPicker.SVCursor.BorderColor3 = Color3.fromRGB(255, 255, 255)
 
-			-- Hue Slider
 			ColorPicker.HueSlider = Instance.new("Frame", ColorPicker.Panel)
 			ColorPicker.HueSlider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			ColorPicker.HueSlider.Size = UDim2.new(0.2, 0, 0.7, 0)
 			ColorPicker.HueSlider.Position = UDim2.new(0.75, 0, 0.1, 0)
 			ColorPicker.HueSlider.ZIndex = 15
 
-			-- Hue Gradient
 			ColorPicker.HueGradient = Instance.new("UIGradient", ColorPicker.HueSlider)
 			ColorPicker.HueGradient.Color = ColorSequence.new{
 				ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
@@ -1398,7 +1459,6 @@ function PurpleBotUI:Create(args)
 				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0)),
 			}
 
-			-- Hue Cursor
 			ColorPicker.HueCursor = Instance.new("Frame", ColorPicker.HueSlider)
 			ColorPicker.HueCursor.Size = UDim2.new(1, 0, 0.05, 0)
 			ColorPicker.HueCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1513,7 +1573,18 @@ function PurpleBotUI:Create(args)
 				ColorPicker.Callback = callback
 			end
 
+			-- Update theme when created
+			function ColorPicker:UpdateTheme()
+				ColorPicker.Frame.BackgroundColor3 = UI.Theme.Background
+				ColorPicker.Stroke.Color = UI.Theme.Border
+				ColorPicker.Label.TextColor3 = UI.Theme.Text
+				ColorPicker.Panel.BackgroundColor3 = UI.Theme.Secondary
+			end
+
 			table.insert(Tab.Components, ColorPicker)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
 			return ColorPicker
 		end
 
@@ -1532,17 +1603,14 @@ function PurpleBotUI:Create(args)
 			ProgressBar.Frame.BorderSizePixel = 0
 			ProgressBar.Frame.ZIndex = 12
 
-			-- ProgressBar Corner
 			ProgressBar.Corner = Instance.new("UICorner", ProgressBar.Frame)
 			ProgressBar.Corner.CornerRadius = UDim.new(0.1, 0)
 
-			-- ProgressBar Stroke
 			ProgressBar.Stroke = Instance.new("UIStroke", ProgressBar.Frame)
 			ProgressBar.Stroke.Color = UI.Theme.Border
 			ProgressBar.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			ProgressBar.Stroke.Thickness = 1.5
 
-			-- ProgressBar Bar
 			ProgressBar.Bar = Instance.new("Frame", ProgressBar.Frame)
 			ProgressBar.Bar.BackgroundColor3 = UI.Theme.Border
 			ProgressBar.Bar.Size = UDim2.new(0.9, 0, 0.5, 0)
@@ -1550,22 +1618,18 @@ function PurpleBotUI:Create(args)
 			ProgressBar.Bar.ZIndex = 13
 			ProgressBar.Bar.BorderSizePixel = 0
 
-			-- Bar Corner
 			ProgressBar.BarCorner = Instance.new("UICorner", ProgressBar.Bar)
 			ProgressBar.BarCorner.CornerRadius = UDim.new(0.5, 0)
 
-			-- Progress Fill
 			ProgressBar.Fill = Instance.new("Frame", ProgressBar.Bar)
 			ProgressBar.Fill.BackgroundColor3 = UI.Theme.Accent
 			ProgressBar.Fill.Size = UDim2.new(ProgressBar.Value / ProgressBar.Max, 0, 1, 0)
 			ProgressBar.Fill.ZIndex = 14
 			ProgressBar.Fill.BorderSizePixel = 0
 
-			-- Fill Corner
 			ProgressBar.FillCorner = Instance.new("UICorner", ProgressBar.Fill)
 			ProgressBar.FillCorner.CornerRadius = UDim.new(0.5, 0)
 
-			-- Progress Text
 			ProgressBar.Text = Instance.new("TextLabel", ProgressBar.Frame)
 			ProgressBar.Text.Text = string.format("%d%%", math.floor((ProgressBar.Value / ProgressBar.Max) * 100))
 			ProgressBar.Text.TextColor3 = UI.Theme.Text
@@ -1600,10 +1664,346 @@ function PurpleBotUI:Create(args)
 				updateProgress(ProgressBar.Value)
 			end
 
+			-- Update theme when created
+			function ProgressBar:UpdateTheme()
+				ProgressBar.Frame.BackgroundColor3 = UI.Theme.Background
+				ProgressBar.Stroke.Color = UI.Theme.Border
+				ProgressBar.Bar.BackgroundColor3 = UI.Theme.Border
+				ProgressBar.Fill.BackgroundColor3 = UI.Theme.Accent
+				ProgressBar.Text.TextColor3 = UI.Theme.Text
+			end
+
 			updateProgress(ProgressBar.Value)
 
 			table.insert(Tab.Components, ProgressBar)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
 			return ProgressBar
+		end
+
+		-- Component: Checkbox (New)
+		function Tab:Checkbox(options)
+			options = options or {}
+			local Checkbox = {
+				IsChecked = options.Default or false,
+				Callback = options.Callback,
+			}
+
+			Checkbox.Frame = Instance.new("TextButton", Tab.ScrollingFrame)
+			Checkbox.Frame.Name = options.Name or "Checkbox"
+			Checkbox.Frame.Text = ""
+			Checkbox.Frame.BackgroundColor3 = UI.Theme.Background
+			Checkbox.Frame.Size = UDim2.new(0.95, 0, 0.06, 0)
+			Checkbox.Frame.AutoButtonColor = false
+			Checkbox.Frame.BorderSizePixel = 0
+			Checkbox.Frame.ZIndex = 12
+
+			Checkbox.Corner = Instance.new("UICorner", Checkbox.Frame)
+			Checkbox.Corner.CornerRadius = UDim.new(0.1, 0)
+
+			Checkbox.Stroke = Instance.new("UIStroke", Checkbox.Frame)
+			Checkbox.Stroke.Color = UI.Theme.Border
+			Checkbox.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			Checkbox.Stroke.Thickness = 1.5
+
+			Checkbox.Label = Instance.new("TextLabel", Checkbox.Frame)
+			Checkbox.Label.Text = options.Text or "Checkbox"
+			Checkbox.Label.TextColor3 = UI.Theme.Text
+			Checkbox.Label.TextScaled = true
+			Checkbox.Label.TextXAlignment = Enum.TextXAlignment.Left
+			Checkbox.Label.FontFace = Font.new("rbxasset://fonts/families/Roboto.json")
+			Checkbox.Label.BackgroundTransparency = 1
+			Checkbox.Label.Size = UDim2.new(0.8, 0, 0.7, 0)
+			Checkbox.Label.Position = UDim2.new(0.1, 0, 0.15, 0)
+			Checkbox.Label.ZIndex = 13
+
+			Checkbox.Box = Instance.new("Frame", Checkbox.Frame)
+			Checkbox.Box.BackgroundColor3 = UI.Theme.Secondary
+			Checkbox.Box.Size = UDim2.new(0.06, 0, 0.6, 0)
+			Checkbox.Box.Position = UDim2.new(0.02, 0, 0.2, 0)
+			Checkbox.Box.ZIndex = 13
+			Checkbox.Box.BorderSizePixel = 0
+
+			Checkbox.BoxCorner = Instance.new("UICorner", Checkbox.Box)
+			Checkbox.BoxCorner.CornerRadius = UDim.new(0.2, 0)
+
+			Checkbox.Checkmark = Instance.new("ImageLabel", Checkbox.Box)
+			Checkbox.Checkmark.Image = "rbxassetid://7072719338" -- Checkmark icon
+			Checkbox.Checkmark.BackgroundTransparency = 1
+			Checkbox.Checkmark.Size = UDim2.new(0.8, 0, 0.8, 0)
+			Checkbox.Checkmark.Position = UDim2.new(0.1, 0, 0.1, 0)
+			Checkbox.Checkmark.Visible = Checkbox.IsChecked
+			Checkbox.Checkmark.ZIndex = 14
+
+			Checkbox.Frame.MouseButton1Click:Connect(function()
+				Checkbox.IsChecked = not Checkbox.IsChecked
+				Checkbox.Checkmark.Visible = Checkbox.IsChecked
+				if Checkbox.Callback then
+					Checkbox.Callback(Checkbox.IsChecked)
+				end
+			end)
+
+			function Checkbox:SetChecked(state)
+				Checkbox.IsChecked = state
+				Checkbox.Checkmark.Visible = state
+				if Checkbox.Callback then
+					Checkbox.Callback(state)
+				end
+			end
+
+			function Checkbox:GetChecked()
+				return Checkbox.IsChecked
+			end
+
+			-- Update theme when created
+			function Checkbox:UpdateTheme()
+				Checkbox.Frame.BackgroundColor3 = UI.Theme.Background
+				Checkbox.Stroke.Color = UI.Theme.Border
+				Checkbox.Label.TextColor3 = UI.Theme.Text
+				Checkbox.Box.BackgroundColor3 = UI.Theme.Secondary
+				Checkbox.Checkmark.ImageColor3 = UI.Theme.Text
+			end
+
+			table.insert(Tab.Components, Checkbox)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
+			return Checkbox
+		end
+
+		-- Component: RadioButtonGroup (New)
+		function Tab:RadioButtonGroup(options)
+			options = options or {}
+			local RadioGroup = {
+				Selected = options.Default or nil,
+				Options = options.Options or {},
+				RadioButtons = {}, -- Store radio button instances
+				Callback = options.Callback,
+			}
+
+			RadioGroup.Frame = Instance.new("Frame", Tab.ScrollingFrame)
+			RadioGroup.Frame.Name = options.Name or "RadioButtonGroup"
+			RadioGroup.Frame.BackgroundTransparency = 1
+			RadioGroup.Frame.Size = UDim2.new(0.95, 0, 0.1 * #RadioGroup.Options, 0)
+			RadioGroup.Frame.ZIndex = 12
+
+			RadioGroup.Layout = Instance.new("UIListLayout", RadioGroup.Frame)
+			RadioGroup.Layout.SortOrder = Enum.SortOrder.LayoutOrder
+			RadioGroup.Layout.Padding = UDim.new(0.02, 0)
+
+			local function createRadioButton(option)
+				local RadioButton = {
+					IsSelected = (option == RadioGroup.Selected),
+				}
+
+				RadioButton.Frame = Instance.new("TextButton", RadioGroup.Frame)
+				RadioButton.Frame.Name = option
+				RadioButton.Frame.Text = ""
+				RadioButton.Frame.BackgroundColor3 = UI.Theme.Background
+				RadioButton.Frame.Size = UDim2.new(1, 0, 0.3, 0)
+				RadioButton.Frame.AutoButtonColor = false
+				RadioButton.Frame.BorderSizePixel = 0
+				RadioButton.Frame.ZIndex = 12
+
+				RadioButton.Corner = Instance.new("UICorner", RadioButton.Frame)
+				RadioButton.Corner.CornerRadius = UDim.new(0.1, 0)
+
+				RadioButton.Stroke = Instance.new("UIStroke", RadioButton.Frame)
+				RadioButton.Stroke.Color = UI.Theme.Border
+				RadioButton.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				RadioButton.Stroke.Thickness = 1.5
+
+				RadioButton.Label = Instance.new("TextLabel", RadioButton.Frame)
+				RadioButton.Label.Text = option
+				RadioButton.Label.TextColor3 = UI.Theme.Text
+				RadioButton.Label.TextScaled = true
+				RadioButton.Label.TextXAlignment = Enum.TextXAlignment.Left
+				RadioButton.Label.FontFace = Font.new("rbxasset://fonts/families/Roboto.json")
+				RadioButton.Label.BackgroundTransparency = 1
+				RadioButton.Label.Size = UDim2.new(0.8, 0, 0.7, 0)
+				RadioButton.Label.Position = UDim2.new(0.1, 0, 0.15, 0)
+				RadioButton.Label.ZIndex = 13
+
+				RadioButton.Indicator = Instance.new("Frame", RadioButton.Frame)
+				RadioButton.Indicator.BackgroundColor3 = UI.Theme.Secondary
+				RadioButton.Indicator.Size = UDim2.new(0.06, 0, 0.6, 0)
+				RadioButton.Indicator.Position = UDim2.new(0.02, 0, 0.2, 0)
+				RadioButton.Indicator.ZIndex = 13
+				RadioButton.Indicator.BorderSizePixel = 0
+
+				RadioButton.IndicatorCorner = Instance.new("UICorner", RadioButton.Indicator)
+				RadioButton.IndicatorCorner.CornerRadius = UDim.new(1, 0) -- Circular shape
+
+				RadioButton.Inner = Instance.new("Frame", RadioButton.Indicator)
+				RadioButton.Inner.BackgroundColor3 = UI.Theme.Accent
+				RadioButton.Inner.Size = UDim2.new(0.5, 0, 0.5, 0)
+				RadioButton.Inner.Position = UDim2.new(0.25, 0, 0.25, 0)
+				RadioButton.Inner.Visible = RadioButton.IsSelected
+				RadioButton.Inner.ZIndex = 14
+				RadioButton.Inner.BorderSizePixel = 0
+
+				RadioButton.InnerCorner = Instance.new("UICorner", RadioButton.Inner)
+				RadioButton.InnerCorner.CornerRadius = UDim.new(1, 0)
+
+				RadioButton.Frame.MouseButton1Click:Connect(function()
+					for _, rb in pairs(RadioGroup.RadioButtons) do
+						rb.IsSelected = false
+						rb.Inner.Visible = false
+					end
+					RadioButton.IsSelected = true
+					RadioButton.Inner.Visible = true
+					RadioGroup.Selected = option
+					if RadioGroup.Callback then
+						RadioGroup.Callback(option)
+					end
+				end)
+
+				return RadioButton
+			end
+
+			for _, opt in ipairs(RadioGroup.Options) do
+				local rb = createRadioButton(opt)
+				table.insert(RadioGroup.RadioButtons, rb)
+			end
+
+			function RadioGroup:SetSelected(option)
+				for _, rb in pairs(RadioGroup.RadioButtons) do
+					if rb.Frame.Name == option then
+						rb.IsSelected = true
+						rb.Inner.Visible = true
+						RadioGroup.Selected = option
+					else
+						rb.IsSelected = false
+						rb.Inner.Visible = false
+					end
+				end
+				if RadioGroup.Callback then
+					RadioGroup.Callback(option)
+				end
+			end
+
+			function RadioGroup:GetSelected()
+				return RadioGroup.Selected
+			end
+
+			-- Update theme when created
+			function RadioGroup:UpdateTheme()
+				for _, rb in pairs(RadioGroup.RadioButtons) do
+					rb.Frame.BackgroundColor3 = UI.Theme.Background
+					rb.Stroke.Color = UI.Theme.Border
+					rb.Label.TextColor3 = UI.Theme.Text
+					rb.Indicator.BackgroundColor3 = UI.Theme.Secondary
+					rb.Inner.BackgroundColor3 = UI.Theme.Accent
+				end
+			end
+
+			table.insert(Tab.Components, RadioGroup)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
+			return RadioGroup
+		end
+
+		-- Component: Accordion (New)
+		function Tab:Accordion(options)
+			options = options or {}
+			local Accordion = {
+				IsOpen = options.Default or false,
+				Components = {},
+			}
+
+			Accordion.Frame = Instance.new("Frame", Tab.ScrollingFrame)
+			Accordion.Frame.Name = options.Name or "Accordion"
+			Accordion.Frame.BackgroundColor3 = UI.Theme.Background
+			Accordion.Frame.Size = UDim2.new(0.95, 0, 0.08, 0)
+			Accordion.Frame.BorderSizePixel = 0
+			Accordion.Frame.ZIndex = 12
+
+			Accordion.Corner = Instance.new("UICorner", Accordion.Frame)
+			Accordion.Corner.CornerRadius = UDim.new(0.1, 0)
+
+			Accordion.Stroke = Instance.new("UIStroke", Accordion.Frame)
+			Accordion.Stroke.Color = UI.Theme.Border
+			Accordion.Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			Accordion.Stroke.Thickness = 1.5
+
+			Accordion.Header = Instance.new("TextButton", Accordion.Frame)
+			Accordion.Header.Text = options.Text or "Accordion"
+			Accordion.Header.TextColor3 = UI.Theme.Text
+			Accordion.Header.TextScaled = true
+			Accordion.Header.FontFace = Font.new("rbxasset://fonts/families/Roboto.json")
+			Accordion.Header.BackgroundTransparency = 1
+			Accordion.Header.Size = UDim2.new(1, 0, 0.5, 0)
+			Accordion.Header.Position = UDim2.new(0, 0, 0, 0)
+			Accordion.Header.ZIndex = 13
+
+			Accordion.Content = Instance.new("Frame", Accordion.Frame)
+			Accordion.Content.Name = "Content"
+			Accordion.Content.BackgroundTransparency = 1
+			Accordion.Content.Size = UDim2.new(1, 0, 0, 0)
+			Accordion.Content.Position = UDim2.new(0, 0, 0.5, 0)
+			Accordion.Content.ClipsDescendants = true
+			Accordion.Content.ZIndex = 13
+
+			Accordion.Layout = Instance.new("UIListLayout", Accordion.Content)
+			Accordion.Layout.SortOrder = Enum.SortOrder.LayoutOrder
+			Accordion.Layout.Padding = UDim.new(0.02, 0)
+
+			local function toggleAccordion()
+				Accordion.IsOpen = not Accordion.IsOpen
+				local targetSize = Accordion.IsOpen and UDim2.new(0.95, 0, 0.08 + 0.1 * #Accordion.Components, 0) or UDim2.new(0.95, 0, 0.08, 0)
+				local contentTargetSize = Accordion.IsOpen and UDim2.new(1, 0, 0.5, 0) or UDim2.new(1, 0, 0, 0)
+				if UI.AnimationsEnabled then
+					PurpleBotUI:Tween(Accordion.Frame, nil, {Size = targetSize})
+					PurpleBotUI:Tween(Accordion.Content, nil, {Size = contentTargetSize})
+				else
+					Accordion.Frame.Size = targetSize
+					Accordion.Content.Size = contentTargetSize
+				end
+			end
+
+			Accordion.Header.MouseButton1Click:Connect(toggleAccordion)
+
+			-- Add Component to Accordion: Supports adding nested components
+			function Accordion:AddComponent(componentType, options)
+				local component
+				if componentType == "Button" then
+					component = Tab:Button(options)
+				elseif componentType == "Slider" then
+					component = Tab:Slider(options)
+				elseif componentType == "Toggle" then
+					component = Tab:Toggle(options)
+				-- Add other component types as needed
+				end
+				if component then
+					component.Frame.Parent = Accordion.Content
+					table.insert(Accordion.Components, component)
+					if Accordion.IsOpen then
+						Accordion.Frame.Size = UDim2.new(0.95, 0, 0.08 + 0.1 * #Accordion.Components, 0)
+						Accordion.Content.Size = UDim2.new(1, 0, 0.5, 0)
+					end
+				end
+				return component
+			end
+
+			-- Update theme when created
+			function Accordion:UpdateTheme()
+				Accordion.Frame.BackgroundColor3 = UI.Theme.Background
+				Accordion.Stroke.Color = UI.Theme.Border
+				Accordion.Header.TextColor3 = UI.Theme.Text
+				for _, comp in ipairs(Accordion.Components) do
+					if comp.UpdateTheme then
+						comp:UpdateTheme()
+					end
+				end
+			end
+
+			table.insert(Tab.Components, Accordion)
+			if Tab.IsActive then
+				Tab.DefaultLabel.Visible = false
+			end
+			return Accordion
 		end
 
 		table.insert(UI.Tabs, Tab)
@@ -1614,7 +2014,7 @@ function PurpleBotUI:Create(args)
 		return Tab
 	end
 
-	-- Drawing Utility
+	-- Drawing Utility: For simple shapes on screen
 	function UI:Drawing(options)
 		options = options or {}
 		local Drawing = {
@@ -1630,11 +2030,9 @@ function PurpleBotUI:Create(args)
 			Drawing.Frame.AnchorPoint = Vector2.new(0.5, 0.5)
 			Drawing.Frame.ZIndex = options.ZIndex or 20
 
-			-- Circle Corner
 			Drawing.Corner = Instance.new("UICorner", Drawing.Frame)
 			Drawing.Corner.CornerRadius = UDim.new(1, 0)
 
-			-- Circle Stroke
 			Drawing.Stroke = Instance.new("UIStroke", Drawing.Frame)
 			Drawing.Stroke.Color = options.Color or UI.Theme.Accent
 			Drawing.Stroke.Thickness = options.Thickness or 2
@@ -1678,35 +2076,39 @@ function PurpleBotUI:Create(args)
 		return Drawing
 	end
 
-	-- Theme Management
+	-- Theme Management: Dynamically updates all UI elements with new theme
 	function UI:SetTheme(theme)
 		UI.Theme = theme
 		UI.MainFrame.BackgroundColor3 = theme.Background
-		UI.TopBar.BackgroundColor3 = theme.Primary
+		UI.TopBar.BackgroundColor3 = UI.IsMinimized and theme.Secondary or theme.Primary
 		UI.Sidebar.BackgroundColor3 = theme.Secondary
 		UI.MainStroke.Color = theme.Border
 		UI.Title.TextColor3 = theme.Text
+		UI.Logo.ImageColor3 = theme.Text
 		UI.ExitButton.TextColor3 = theme.Text
 		UI.MinimizeButton.ImageColor3 = theme.Text
 		UI.NotifyFrame.BackgroundColor3 = theme.Background
 		UI.NotifyText.TextColor3 = theme.Text
 		UI.NotifyStroke.Color = theme.Accent
+		if UI.Icon then
+			UI.Icon.ImageColor3 = theme.Text
+		end
+
 		for _, tab in ipairs(UI.Tabs) do
+			tab.Button.TextColor3 = theme.Text
+			tab.ButtonStroke.Color = tab.IsActive and theme.Primary or theme.Border
+			tab.Button.BackgroundColor3 = tab.IsActive and theme.Primary or theme.Secondary
+			tab.ScrollingFrame.ScrollBarImageColor3 = theme.Accent
+			tab.DefaultLabel.TextColor3 = theme.Text
 			for _, comp in ipairs(tab.Components) do
-				if comp.Frame then
-					comp.Frame.BackgroundColor3 = theme.Background
-					if comp.Stroke then
-						comp.Stroke.Color = theme.Border
-					end
-					if comp.Text then
-						comp.Text.TextColor3 = theme.Text
-					end
+				if comp.UpdateTheme then
+					comp:UpdateTheme()
 				end
 			end
 		end
 	end
 
-	-- Animation Toggle
+	-- Animation Toggle: Enables or disables all animations
 	function UI:ToggleAnimations(enabled)
 		UI.AnimationsEnabled = enabled
 	end
@@ -1719,6 +2121,43 @@ function PurpleBotUI:Create(args)
 	function UI:GetCurrentTab()
 		return UI.CurrentTab
 	end
+
+	-- Keyboard Navigation: Left/Right arrows to switch tabs
+	local function selectNextTab()
+		local currentIndex = table.find(UI.Tabs, UI.CurrentTab)
+		if currentIndex then
+			local nextIndex = (currentIndex % #UI.Tabs) + 1
+			UI.Tabs[nextIndex]:Activate()
+			for _, tab in ipairs(UI.Tabs) do
+				if tab ~= UI.Tabs[nextIndex] then
+					tab:Deactivate()
+				end
+			end
+		end
+	end
+
+	local function selectPrevTab()
+		local currentIndex = table.find(UI.Tabs, UI.CurrentTab)
+		if currentIndex then
+			local prevIndex = (currentIndex - 2) % #UI.Tabs + 1
+			UI.Tabs[prevIndex]:Activate()
+			for _, tab in ipairs(UI.Tabs) do
+				if tab ~= UI.Tabs[prevIndex] then
+					tab:Deactivate()
+				end
+			end
+		end
+	end
+
+	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if not gameProcessed then
+			if input.KeyCode == Enum.KeyCode.Right then
+				selectNextTab()
+			elseif input.KeyCode == Enum.KeyCode.Left then
+				selectPrevTab()
+			end
+		end
+	end)
 
 	return UI
 end
